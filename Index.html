@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Russische Revolution: Welche Partei passt zu dir?</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    h1, h2 { text-align: center; }
+    .question { margin: 20px 0; }
+    label { display: block; margin: 5px 0; }
+    .result { font-weight: bold; font-size: 1.2em; margin-top: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>Welche Partei würdest du in der Russischen Revolution unterstützen?</h1>
+  <form id="quizForm">
+    <div id="questions"></div>
+    <button type="submit">Auswertung anzeigen</button>
+  </form>
+  <div class="result" id="result"></div>
+
+  <script>
+    const statements = [
+      "Der Adel und Großgrundbesitz sollen enteignet werden.",
+      "Gewalt kann ein legitimes Mittel der Politik sein.",
+      "Ein starker Staat mit zentraler Führung ist notwendig.",
+      "Die Bauern sind das Rückgrat der Gesellschaft.",
+      "Veränderungen sollen schrittweise und demokratisch verlaufen.",
+      "Die Industriearbeiter sollen die Gesellschaft führen.",
+      "Ein Parlament soll über Gesetze entscheiden, nicht einzelne Gruppen.",
+      "Ein demokratisches Russland braucht politische Kompromisse.",
+      "Die Kirche sollte keinen Einfluss auf die Politik haben.",
+      "Eine Revolution ist notwendig, um echte Veränderung zu erreichen."
+    ];
+
+    const weights = [
+      { bol: 2, men: 1, soz: 2, lib: -2 },
+      { bol: 2, men: 0, soz: 1, lib: -2 },
+      { bol: 2, men: 1, soz: 0, lib: -1 },
+      { bol: 0, men: 0, soz: 2, lib: 0 },
+      { bol: -2, men: 2, soz: 1, lib: 2 },
+      { bol: 2, men: 1, soz: 0, lib: -1 },
+      { bol: -2, men: 2, soz: 1, lib: 2 },
+      { bol: -1, men: 2, soz: 1, lib: 2 },
+      { bol: 2, men: 1, soz: 0, lib: 0 },
+      { bol: 2, men: 0, soz: 2, lib: -2 }
+    ];
+
+    const container = document.getElementById("questions");
+
+    statements.forEach((text, index) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `<p><strong>${index + 1}.</strong> ${text}</p>`;
+      for (let i = 1; i <= 5; i++) {
+        div.innerHTML += `
+          <label>
+            <input type="radio" name="q${index}" value="${i}" required>
+            ${i} (${i === 1 ? "Stimme gar nicht zu" : i === 5 ? "Stimme voll zu" : ""})
+          </label>`;
+      }
+      container.appendChild(div);
+    });
+
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const results = { bol: 0, men: 0, soz: 0, lib: 0 };
+      for (let i = 0; i < statements.length; i++) {
+        const value = parseInt(document.querySelector(`input[name='q${i}']:checked`).value);
+        results.bol += value * weights[i].bol;
+        results.men += value * weights[i].men;
+        results.soz += value * weights[i].soz;
+        results.lib += value * weights[i].lib;
+      }
+      const maxParty = Object.entries(results).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+      const names = {
+        bol: "Bolschewiki",
+        men: "Menschewiki",
+        soz: "Sozialrevolutionäre",
+        lib: "Liberale (Kadetten)"
+      };
+      document.getElementById("result").textContent = `Du würdest wahrscheinlich die ${names[maxParty]} unterstützen.`;
+    });
+  </script>
+</body>
+</html>
